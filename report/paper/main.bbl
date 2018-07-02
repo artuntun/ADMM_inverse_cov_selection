@@ -1,0 +1,18 @@
+\begin{thebibliography}{1}
+
+\bibitem{convexanalysis}
+R.~T. Rockafellar.
+\newblock {\em Convex Analysis.}
+\newblock 1970.
+
+\bibitem{ADMM}
+E.~Chu B.~Peleato S.~Boyd, N.~Parikh and J.~Eckstein.
+\newblock Distributed optimization and statistical learning via the alternating
+  direction method of multipliers.
+\newblock {\em Foundations and Trends in Machine Learning}, 2010.
+
+\bibitem{voting}
+govTrack.
+\newblock Voting records.
+
+\end{thebibliography}

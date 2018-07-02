@@ -1,0 +1,12 @@
+\section{Annex}
+
+Proof of dual tolerance for (\ref{eq:admm_problem}). By optimality conditions we know that $\nabla_x L(X,Z^{k},U^{k}) = 0$. Hence,
+\begin{align*}
+0 &= C^T - (X^{k+1})^{-T} + \rho(X^{k+1}-Z^k+U^k) \\
+ &= C^T - (X^{k+1})^{-T} + \rho(X^{k+1}-Z^k+U^k)+\rho Z^{k+1}-\rho Z^{k+1}  \\
+&= C^T - (X^{k+1})^{-T} + \rho(R^{k+1}+U^k)+\rho (Z^{k+1}-Z^{k}) \\
+&= C^T - (X^{k+1})^{-T} + \rho U^{k+1}+\rho (Z^{k+1}-Z^{k}) \\
+\rho(Z^{k+1}-Z^{k})&= C^T - (X^{k+1})^{-T} + \rho U^{k+1}  \\
+\rho S^{k+1}&= C^T - (X^{k+1})^{-T} + \rho U^{k+1}  \\
+\end{align*}
+which demonstrate the choice of (\ref{eq:ep_dual}).

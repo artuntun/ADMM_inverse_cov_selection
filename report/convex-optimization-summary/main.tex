@@ -1,0 +1,62 @@
+\documentclass[a4paper]{article}
+
+%% Language and font encodings
+\usepackage[english]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+
+%% Sets page size and margins
+\usepackage[a4paper,top=3cm,bottom=2cm,left=3cm,right=3cm,marginparwidth=1.75cm]{geometry}
+
+%% Useful packages
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{amssymb} %for writing Real number symbol 
+
+\newcommand{\minim}[2]{\begin{equation}
+\begin{aligned}
+&\text{minimize}& &#1\\
+&\text{subject to}& &#2
+\end{aligned}
+\end{equation}}
+
+\newcommand{\maxim}[2]{\begin{equation}
+\begin{aligned}
+&\text{maximize}& &#1\\
+&\text{subject to}& &#2
+\end{aligned}
+\end{equation}}
+
+\newcommand{\maximall}[3]{\begin{equation}
+\begin{aligned}
+&\text{maximize}& &#1\\
+&\text{subject to}& &#2 \\
+& & &#3
+\end{aligned}
+\end{equation}}
+
+\newcommand{\minimall}[3]{\begin{equation}
+\begin{aligned}
+&\text{minimize}& &#1\\
+&\text{subject to}& &#2\\
+& & &#3
+\end{aligned}
+\end{equation}}
+
+
+\title{Your Paper}
+\author{You}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Your abstract.
+\end{abstract}
+
+
+
+\include{Duality}
+\end{document}

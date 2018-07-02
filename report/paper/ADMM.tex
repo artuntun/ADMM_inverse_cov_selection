@@ -1,0 +1,149 @@
+\section{Alternating Direction Method of Multipliers}
+
+The main foundations of ADMM are \textit{the dual ascent method} for solving convex optimization problems, \textit{dual decomposition} for decomposing the objective and constraint functions and \textit{the method of multipliers} which guarantee differentiability under mild conditions.
+
+\subsection{Dual Ascent}
+
+Given the following convex optimization problem with linear constraints,
+\minimlabel{f(x)}{Ax=b}{original}
+with variables $x \in \mathbb{R}^n$, where $A \in \mathbb{R}^{m\times n}$, and $f: \mathbb{R}^n \rightarrow \mathbb{R}$ is convex. The lagrangian,
+\begin{equation*}
+	L(x,y)=f(x) + y^T(Ax-b)
+\end{equation*}
+and the dual function,
+\begin{equation*}
+	g(y) = \inf_x L(x,y) = -f*(-A^Ty)-b^Ty
+\end{equation*}
+where $y \in \mathbb{R}^m$ is the Lagrangian multiplier, and $f^*$ is the convex conjugate of f. The dual problem then becomes 
+\begin{equation*}
+	\mbox{minimize} \quad g(y)
+\end{equation*}
+if strong duality holds, then we can recover the solution of the primal problem,$x^*$ from the the dual problem solution, $y^*$ as
+\begin{equation*}
+	x^* := minimize L(x,y^*)
+\end{equation*}
+the \textit{dual ascent method} consists on taking steps towards the dual function gradient and updating the primal solution iteratively,
+
+\begin{align}
+&x^{k+1} := \argmin_x L(x,y^k) \label{eq:updual1}\\ 
+&y^{k+1} := y^k + \alpha^k(Ax^{k+1}-b) \label{dual2}
+\end{align}
+where $\alpha^k>0$ is the step size, which control how fast the solution converges, but in case of too high value it might lead to convergence problems. The names \textit{dual ascent} comes from the fact that $g(y)$ increases in every step. However, some conditions must hold to guarantee convergence and functioning of the algorithm. For instance, $g(y)$ must be differentiable in order to evaluate the it gradient, and \textit{dual subgradient method} should be used instead. Another exampel is the case when $f(x)$ is a non-zero affine function, in which case the update (\ref{eq:updual1}) would fail since the Lagrangian is unbounded below for most of $y$ and $x$.
+
+\subsection{Dual decomposition}
+
+The strength of \textit{dual ascent} is that it can lead to a decentralized algorithm when the objective and constraint functions are separable,
+
+\begin{equation*}
+f(x) = \sum_{i=1}^{N}f_i(x_i) \qquad Ax = \sum_{i=1}^{N}A_ix_i 
+\end{equation*}
+where $x = (x_1,x_2,...x_N)$ and $x_i \in \mathbb{R}^{n_i}$. Then the Lagrangian looks like
+
+\begin{equation*}
+	L(x,y) = \sum_{i=1}^{N}f_i(x_i)+y^T(A_ix_i - b) -(1/N)y^Tb
+\end{equation*}
+meaning that the dual ascent method consist in N primal variables updates and one dual step as
+
+\begin{align}
+	&x_i^{k+1} := \argmin_x \quad L_i(x_i,y^k)\\
+	&y^{k+1} := y^k + \alpha^k(Ax^{k+1} - b)
+\end{align}
+
+\subsection{Method of multipliers}
+
+As already stated, dual ascent assume very strict conditions on the initial problem such as strict convexity and finiteness of $f$. In order to overcome some of this issues the \textit{augmented Lagrangian} is introduced,
+
+\begin{equation*}
+	L_\rho(x,y) = f(x) + y^T(Ax-b) + (\rho/2)||Ax-b||_2^2
+\end{equation*}
+where $\rho$ is the \textit{penalty parameter}. The \textit{augmented Lagrangian} is equivalent to solve the transformed initial problem 
+
+\minimlabel{f(x)+||Ax-b||_2^2}{Ax=b}{trans_prob}
+The problem (\ref{eq:trans_prob}) is clearly equivalent to the original problem, (\ref{eq:original}), since the residual $Ax -b$ is zero at the optimal feasible point. This new formulation brings the benefit of differentiability under rather mild conditions on the original problem. The new dual functions is $g_\rho(y)=inf L_\rho(x,y)$. This leads to the \textit{method of multipliers}
+
+\begin{align}
+	&x^{k+1} :=\argmin_x \quad L_\rho(x,y^k)\label{eq:mmstep1}\\ 
+	&y^{k+1} = y^k + \rho(Ax^{k+1}-b)		
+\end{align}
+In practice the learning parameter could be anything, instead of $\rho$, but it is motivated for convergence reasons. The original problem posses the following primal and dual feasibility conditions
+
+\begin{equation*}
+	Ax^* -b =0, \qquad \nabla f(x^*) + A^Ty^* = 0,
+\end{equation*}
+Now, if we look at the minimization step (\ref{eq:mmstep1}) it minimize the augmented Lagrangian,$L_\rho(x,y^k)$
+
+\begin{align*}
+	0 &=\nabla_xL(x^{k+1},y^k)\\
+	&= \nabla_x f(x) + y^TA + \rho(Ax^{k+1} -b)\\
+	&= \nabla_x f(x^{k+1}) + A^Ty^{k+1}
+\end{align*}
+making every step dual feasible. However the method of multipliers has a drawback. Even thought that $f$ is separable, its augmented Lagrangian, $L_\rho$, is not. This problem is addressed by the Alternating Direction Method of Multipliers
+
+\subsection{ADMM algorithm}
+
+ADMM mix the decomposability of dual ascent with the superior convergence properties of \textit{method of multipliers}. Given a problem as 
+
+\minimlabel{f(x)+g(z)}{Ax+Bz=c}{twovariables}
+The associated augmented Lagrangian would be,
+
+\begin{equation*}
+	L_\rho(x,z,y) = f(x)+g(z)+y^T(Ax + Bz-c)+(\rho/2)||Ax+Bz-c||_2^2
+\end{equation*}
+If we would intended to apply \textit{the method of multipliers} the iteration updates would look like,
+
+\begin{align*}
+	&(x^{k+1},z^{k+1}) := \argmin_x L_\rho(x,z,y^k)\\
+	&y^{k+1} := y^k + \rho(Ax^{k+1}+Bz^{k+1} -c)
+\end{align*}
+where $x$ and $z$ are jointly optimized. However we an take an additional step and optimize each of the variables separately.
+
+\begin{align}
+&x^{k+1} := \argmin_x \quad L_\rho(x,z^k,y^k)\\
+&z^{k+1} := \argmin_z \quad L_\rho(x^{k+1},z,y^k)\\
+&y^{k+1} := y^k + \rho(Ax^{k+1}+Bz^{k+1} -c)
+\end{align}
+this is \textit{finally} the \textit{Alternating Direction Method of Multipliers}. The \textit{alternating} accounts for the fact that $x$ and $z$ can be minimized in an alternating or sequential fashion. 
+
+\subsubsection{Scaled form}
+
+The ADMM updates can be reformulated in a slightly different form which usually lead to shorter equations. If we define the residual as $r=Ax+Bz-c$ and $u = (1/\rho)y$ as the scaled dual variable, the augmented Lagrangian of the problem (\ref{eq:twovariables}) follows as
+
+\begin{equation*}
+	L_\rho(x,z,u) = f(x) + g(z) + (\rho/2)||r+u||_2^2 - (\rho/2)||u||_2^2
+\end{equation*}
+and then the \textit{scaled} form of ADMM 
+
+\begin{align}
+&x^{k+1} := \argmin_x \quad \Big(f(x)+(\rho/2)||Ax+Bz^k-c+u^k||_2^2\Big)\\
+&z^{k+1} := \argmin_z \quad \Big(g(z)+(\rho/2)||Ax^{k+1}+Bz-c+u^k||_2^2\Big)\\
+&y^{k+1} := y^k + \rho(Ax^{k+1}+Bz^{k+1} -c)
+\end{align}
+
+\subsubsection{Optimality conditions and Stopping criterion}
+The optimality conditions for the problem \ref{eq:twovariables} are primal feasibility,
+\begin{equation}
+	Ax^* + B^*z -c = 0 \label{eq:primal_fes}
+\end{equation}
+and dual feasibility,
+\begin{align}
+	&0\in \partial f(x^*)+A^Ty^*\label{eq:dual_fes1}\\
+	&0\in \partial g(z^*)+B^Ty^* \label{eq:dual_fes2}
+\end{align}
+for the same reasons as explained in the \textit{method of multipliers} the $z^{k+1}$ and $y^{k+1}$ always satisfy (\ref{eq:dual_fes2}) so we have to only look at (\ref{eq:dual_fes1}) and (\ref{eq:primal_fes}). Since $x^{k+1}$ minimize $L_\rho(x,z^k,y^k)$ by definition we have
+
+\begin{align*}
+	0 &\in \partial f(x^{k+1}) +A^Ty^k+\rho A^T(Ax^{k+1}+Bz^k-c)\\
+	&=\partial  f(x^{k+1}) + A^T(y^k+\rho r^{k+1} \rho B(z^k - z^{k+1}))\\
+	&=\partial f(x^{k+1}) + A^Ty^{k+1} \rho A^TB(z^k - z^{k+1})),\\	
+	\rho A^TB(z^k - z^{k+1})&=\partial f(x^{k+1}) + A^Ty^{k+1})
+\end{align*}
+So we can define  
+
+\begin{equation*}
+	s^{k+1} = \rho A^TB(z^k - z^{k+1})
+\end{equation*}
+as the \textit{dual residual} for (\ref{eq:dual_fes1}) and $r^{k+1}=Ax^{k+1}+Bz^{k+1}-c$ as the \textit{primal residual} for (\ref{eq:primal_fes}).
+
+
+
+

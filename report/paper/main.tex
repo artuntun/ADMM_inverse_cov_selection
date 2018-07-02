@@ -1,0 +1,87 @@
+\documentclass[a4paper]{article}
+
+%% Language and font encodings
+\usepackage[english]{babel}
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+
+%% Sets page size and margins
+\usepackage[a4paper,top=3cm,bottom=2cm,left=4cm,right=4cm,marginparwidth=1.75cm]{geometry}
+
+%% Useful packages
+\usepackage{amsmath}
+\usepackage{graphicx}
+\usepackage[colorinlistoftodos]{todonotes}
+\usepackage[colorlinks=true, allcolors=blue]{hyperref}
+\usepackage{amssymb} %for writing Real number symbol 
+\numberwithin{equation}{section}
+\usepackage{color,soul}
+\usepackage{float}
+
+
+\DeclareMathOperator*{\argmin}{argmin} 
+
+\newcommand{\minim}[2]{\begin{equation}
+\begin{aligned}
+&\text{minimize}& &#1\\
+&\text{subject to}& &#2
+\end{aligned}
+\end{equation}}
+
+\newcommand{\minimlabel}[3]{\begin{equation}
+	\begin{aligned} 
+	&\text{minimize}& &#1\\
+	&\text{subject to}& &#2
+	\end{aligned}\label{eq:#3}
+	\end{equation}}
+
+\newcommand{\maxim}[2]{\begin{equation}
+\begin{aligned}
+&\text{maximize}& &#1\\
+&\text{subject to}& &#2
+\end{aligned}
+\end{equation}}
+
+\newcommand{\maximall}[3]{\begin{equation}
+\begin{aligned}
+&\text{maximize}& &#1\\
+&\text{subject to}& &#2 \\
+& & &#3
+\end{aligned}
+\end{equation}}
+
+\newcommand{\minimall}[3]{\begin{equation}
+\begin{aligned}
+&\text{minimize}& &#1\\
+&\text{subject to}& &#2\\
+& & &#3
+\end{aligned}
+\end{equation}}
+
+
+
+
+
+\title{Inverse Covariance Selection via ADMM}
+\author{Arturo Arranz Mateo}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+In a Gaussian distributions, conditional independence between variables correspond to zero entries in the inverse covariance matrix. However, estimating the inverse from samples under the assumption of sparsity is not straight forward. For small matrices an fixed sparse pattern, it can be calculated as a convex optimization problem. Nonetheless, for high dimensional data and general sparse patterns the problem becomes intractable and heuristics are needed, such as lasso regularization. Another associated problem of with high dimensional data, which accounts for most of the data applications nowadays, is the problem of storage and computation time. In this project explore the distributed algorithm, Alternating Directions Method of Multipliers(ADMM) for the \textit{inverse covariance selection problem} thanks to its decomposability nature and finally we show some applications for political voting analysis in the US senate. 
+\end{abstract}
+
+\input{ADMM}
+\input{cov_inv}
+\input{results}
+\input{Duality}
+
+
+
+
+
+\bibliographystyle{unsrt}
+\bibliography{bibliography} 
+
+\end{document}

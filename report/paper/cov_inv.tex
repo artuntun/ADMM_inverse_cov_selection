@@ -1,0 +1,83 @@
+\section{Inverse Covariance Selection}
+
+Zero entries in the inverse covariance matrix correspond to conditional independence of random variables, i.e. knowing the value of one variable do not give information about other knowing the rest. Non-zero entries in the covariance matrix in the case of conditional independence might be contaminated by other variables correlations.
+
+ Estimating the inverse covariance for small matrices and fixed sparse patterns is a tractable convex optimization problem. However, when a priori it is not known which variables are conditionally independent it becomes a combinatorial problem which scales exponentially with $n$. Lasso regularization is an heuristic which address this issue.
+
+\subsection{Sparse regularization}
+Suppose the case where we have samples from a zero mean Gaussian distribution,
+
+\begin{equation*}
+	x_i \sim \mathcal{N}(0,\Sigma), \quad i=1,2,...,N
+\end{equation*}
+which computational covariance matrix will be denoted as $C$. One way to estimate the inverse covariance is by means of the Kullback-Leibler divergence which is defined as 
+\begin{equation*}
+	D_{KL}(\mathcal{N}_1||\mathcal{N}_0) = \frac{1}{2}\Big(tr(\Sigma^{-1}_0\Sigma_1)+(\mu_0-\mu_1)^T\Sigma^{-1}_0 (\mu_0-\mu_1) -k +ln\Big(\frac{det\Sigma 0}{det \Sigma_1}\Big)\Big)
+\end{equation*}
+for two k-dimensional Gaussian distributions. So if we define $S = \Sigma^{-1}_1 $ and $X = \Sigma_0$ and minimize the $D_{KL}$ respect to X we have
+\begin{equation}
+	\mbox{minimize}\quad \textrm{Tr}(CX)-\textrm{lndet} X+ cte
+\end{equation}
+after assuming that both distributions have the same mean. Since the Kullback divergence is a measure on how similar two distributions are, after the minimization problem we would have $C = X^{-1}$. Therefore, $X$ is the inverse covariance estimation. 
+
+Nonetheless what we are trying to estimate is a sparse general pattern on $X$ which can be introduced through Lasso regularization
+
+\begin{equation}
+\mbox{minimize}\quad \textrm{Tr}(CX)-\textrm{lndet} X+ \lambda |X|_1
+\end{equation}
+
+\subsection{ADMM formulation}
+
+The same problem can be expressed as constrained optimization problem with two variables,
+
+\minimlabel{\quad \textrm{Tr}(SX)-\textrm{lndet} X+ \lambda |Z|_1}{X-Z=0}{admm_problem}
+now, following the ADMM framework it can be solved iteratively with the updates
+
+\begin{align*}
+&X^{k+1} := \argmin_x \quad\Big(\textrm{Tr}(CX)-\textrm{lndet}X+(\rho/2)||X-Z^k+U^k||_F^2\Big)\\
+&Z^{k+1} := \argmin_z\quad \Big(\lambda||Z||_1+(\rho/2)||X-Z^k+U^k||_F^2\Big)\\
+&U^{k+1} := U^k + X^{k+1}+Z{k+1}
+\end{align*}
+the updates can be simplify even further. For example the there exists a closed form solution for the z-minimization step which corresponds to a soft thresholding operation \cite[p.~23]{convexanalysis}
+
+\begin{equation*}
+	Z_{ij}^{k+1} = S_{\lambda/\rho}(X^{k+1}_{ij}+U^k_{ij})
+\end{equation*}
+but also the x-minimization step can be expressed as a closed from solution \cite[p.~47]{ADMM}
+
+\begin{equation*}
+X^{k+1} = Q\hat{X}Q^T
+\end{equation*}
+where $Q$ comes from the orthogonal eigenvalue decomposition of $\rho(Z^k-U^k)-S=Q\Lambda Q^T$ and $\hat{X}$ is a diagonal matrix with the form,
+
+\begin{equation*}
+	\hat{X}_{ii} = \frac{\lambda_i+\sqrt{\lambda_i^2+4\rho}}{2\rho}
+\end{equation*}
+which turns out to be a very cheap computational algorithm, where most of the effort is calculating an eigenvalue decomposition.
+
+
+\subsubsection{Stopping criteria}
+
+The algorithm is iterated until the primal and dual residuals
+
+\begin{equation*}
+R^{k+1} = X-Z \qquad S^{k+1} = \rho(Z^k-Z{k+1})
+\end{equation*}
+are less than the primal and dual tolerance
+
+\begin{equation*}
+\epsilon_{primal}>||R^{k+1}||_2 \qquad\epsilon_{dual} > ||S{k+1}||_2
+\end{equation*}
+where $\epsilon_{primal}$ and $\epsilon_{dual}$ are derived from the optimality conditions in the Annex
+
+\begin{align}
+	&\epsilon_{primal} = \epsilon_{abs}\sqrt{n}+ \epsilon_{rel}\max(||X||_2,||Z||_2) \label{eq:ep_primal}\\
+	&\epsilon_{dual} = \epsilon_{abs}\sqrt{p}+ \epsilon_{rel}||S^T-X^{-T}+\rho U||_2 \label{eq:ep_dual}
+\end{align}
+where $\epsilon_{abs}$ and $\epsilon_{rel}$ are the absolute and relative tolerance for controlling accuracy of the solution. 
+
+
+
+
+
+
